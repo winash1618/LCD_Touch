@@ -116,6 +116,12 @@ Button btn[] = {
 
 // create value button below memory buttons 
 
+int readValueFromEEPROM(int index)
+{
+  byte high = EEPROM.read((btn[index].id - 1) * 2);
+  byte low = EEPROM.read((btn[index].id - 1) * 2 + 1);
+  return (word(high, low));
+}
 
 void setup()
 {
@@ -137,7 +143,7 @@ void setup()
     btn[i].draw();
     if (btn[i].class_id == BUTTON_CLASS::ValueButton) {
       btn[i].clear();
-      btn[i].displayNumber(EEPROM.read((btn[i].id - 1) * 2));
+      btn[i].displayNumber(readValueFromEEPROM(i));
     }
   }
 }
@@ -181,57 +187,61 @@ void handleDigit(int i)
   if (btn[i].id == DisplayButtonName::Plus1)
   {
     Serial.println("plusButton");
-    modifyDigit(i, 100);
+    modifyDigit(100);
   }
   else if (btn[i].id == DisplayButtonName::Minus1)
   {
     Serial.println("minusButton");
-    modifyDigit(i, -100);
+    modifyDigit(-100);
   }
   else if (btn[i].id == DisplayButtonName::Plus2)
   {
     Serial.println("plusButton2");
-    modifyDigit(i, 10);
+    modifyDigit(10);
   }
   else if (btn[i].id == DisplayButtonName::Minus2)
   {
     Serial.println("minusButton2");
-    modifyDigit(i, -10);
+    modifyDigit(-10);
   }
   else if (btn[i].id == DisplayButtonName::Plus3)
   {
     Serial.println("plusButton3");
-    modifyDigit(i, 1);
+    modifyDigit(1);
   }
   else if (btn[i].id == DisplayButtonName::Minus3)
   {
     Serial.println("minusButton3");
-    modifyDigit(i, -1);
+    modifyDigit(-1);
   }
 }
-void modifyDigit(int i, int val)
+
+void modifyDigit(int val)
 {
   num = num + val;
   if (num > 999)
-    num = num - val;
-  btn[i].clear();
-  btn[i].displayNumber(num);
+    num = 999;
+  if (num < 0)
+    num = 0;
+  btn[12].clear();
+  btn[12].displayNumber(num);
 }
 
 void performMemoryButtonAction(int i) {
   Serial.println(btn[i].text);
-  EEPROM.write((btn[i].id - 1) * 2, num);
+  EEPROM.write(btn[i].id - 1) * 2,highByte(yourInteger);
+  EEPROM.write(btn[i].id - 1) * 2 + 1,lowByte(yourInteger);
   btn[i + 1].clear();
-  btn[i + 1].displayNumber(i);
+  btn[i + 1].displayNumber(num);
   delay(5000);
 }
 void updateValueButton(int index)
 {
   Serial.println(btn[index].text);
   Serial.println("valueButton5");
-  num = EEPROM.read((btn[index].id - 1) * 2);
-  btn[14].clear();
-  btn[14].displayNumber(num);
+  num=readValueFromEEPROM(index);
+  btn[12].clear();
+  btn[12].displayNumber(num);
 }
 /*********************************************************************************************************
   END FILE
