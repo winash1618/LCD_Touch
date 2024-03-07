@@ -737,3 +737,18 @@ void printTouchEvent() {
   }
 }
 
+TP_DRAW touchEvent() {
+  TP_Scan(0);
+  if (sTP_DEV.chStatus & TP_PRESS_DOWN) {
+      return sTP_Draw;
+  }
+  else {
+    TP_DRAW empty;
+    empty.Xpoint = 0;
+    empty.Ypoint = 0;
+    empty.Color = 0;
+    return empty;
+  }
+}
+
+

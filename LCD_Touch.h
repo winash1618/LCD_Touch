@@ -52,4 +52,5 @@ void TP_Dialog(void);
 void TP_DrawBoard(void);
 void TP_Init( LCD_SCAN_DIR Lcd_ScanDir );
 void printTouchEvent() ;
+TP_DRAW touchEvent();
 #endif
