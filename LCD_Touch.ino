@@ -229,8 +229,8 @@ void modifyDigit(int val)
 
 void performMemoryButtonAction(int i) {
   Serial.println(btn[i].text);
-  EEPROM.write(btn[i].id - 1) * 2,highByte(yourInteger);
-  EEPROM.write(btn[i].id - 1) * 2 + 1,lowByte(yourInteger);
+  EEPROM.write((btn[i].id - 1) * 2,highByte(num));
+  EEPROM.write((btn[i].id - 1) * 2 + 1,lowByte(num));
   btn[i + 1].clear();
   btn[i + 1].displayNumber(num);
   delay(5000);
