@@ -5,7 +5,7 @@
 #include "Button.h"
 #include <EEPROM.h>
 #include "Constants.h"
-#include "Utils.h"
+#include "Events.h"
 
 Button btn[] = {
   Button(STYLE::COL0, STYLE::ROW0, STYLE::COL1, STYLE::ROW1, "Home", BUTTON_CLASS::MainButton, MAIN_BUTTON_NAME::Home),
@@ -42,13 +42,92 @@ Button btn[] = {
   Button(STYLE::COL5, STYLE::ROW4, STYLE::COL6, STYLE::ROW5, "Val 5", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value5)
 };
 
-Servo myservo;
+
+int num = 0;
+
+int readValueFromEEPROM(int index)
+{
+  byte high = EEPROM.read((btn[index].id - 1) * 2);
+  byte low = EEPROM.read((btn[index].id - 1) * 2 + 1);
+  return (word(high, low));
+}
+
+
+void handleDigit(int i)
+{
+  if (btn[i].id == DisplayButtonName::Plus1)
+  {
+    Serial.println("plusButton");
+    modifyDigit(100);
+  }
+  else if (btn[i].id == DisplayButtonName::Minus1)
+  {
+    Serial.println("minusButton");
+    modifyDigit(-100);
+  }
+  else if (btn[i].id == DisplayButtonName::Plus2)
+  {
+    Serial.println("plusButton2");
+    modifyDigit(10);
+  }
+  else if (btn[i].id == DisplayButtonName::Minus2)
+  {
+    Serial.println("minusButton2");
+    modifyDigit(-10);
+  }
+  else if (btn[i].id == DisplayButtonName::Plus3)
+  {
+    Serial.println("plusButton3");
+    modifyDigit(1);
+  }
+  else if (btn[i].id == DisplayButtonName::Minus3)
+  {
+    Serial.println("minusButton3");
+    modifyDigit(-1);
+  }
+}
+
+void modifyDigit(int val)
+{
+  num = num + val;
+  if (num > 999)
+    num = 999;
+  if (num < 0)
+    num = 0;
+  btn[12].clear();
+  btn[12].displayNumber(num);
+}
+
+void performMemoryButtonAction(int i) {
+  Serial.println(btn[i].text);
+  EEPROM.write((btn[i].id - 1) * 2,highByte(num));
+  EEPROM.write((btn[i].id - 1) * 2 + 1,lowByte(num));
+  btn[i + 1].clear();
+  btn[i + 1].displayNumber(num);
+  delay(5000);
+}
+
+void updateValueButton(int index)
+{
+  Serial.println(btn[index].text);
+  Serial.println("valueButton5");
+  num=readValueFromEEPROM(index);
+  btn[12].clear();
+  btn[12].displayNumber(num);
+}
+
+Events events;
 
 
 void setup()
 {
   System_Init();
-
+  pinMode(stp, OUTPUT);
+  pinMode(dir, OUTPUT);
+  pinMode(MS1, OUTPUT);
+  pinMode(MS2, OUTPUT);
+  pinMode(EN, OUTPUT);
+  pinMode(LIMIT, INPUT_PULLUP);
   Serial.println("3.5inch TFT Touch Shield Touch Demo");
   Serial.println("Init...");
   LCD_SCAN_DIR Lcd_ScanDir = SCAN_DIR_DFT;    //SCAN_DIR_DFT = D2U_L2R
@@ -69,22 +148,23 @@ void setup()
     }
   }
 }
+
 TP_DRAW event;
-int num = 0;
 
 void eventControl(int btn)
 {
-  if(btn == BUTTON_CLASS::MainButton::Home)
+  if(btn == Home)
   {
-    
+    events.Home();
+    num = 0;
   }
-  else if(btn == BUTTON_CLASS::MainButton::Stop)
+  else if(btn == Stop)
   {
-    Serial.println("Stop");
+    events.Stop();
   }
-  else if(btn == BUTTON_CLASS::MainButton::Go)
+  else if(btn == Go)
   {
-    Serial.println("Go");
+    events.Go(num);
   }
 }
 
@@ -98,7 +178,7 @@ void loop()
         switch (btn[i].class_id) {
           case BUTTON_CLASS::MainButton:
             Serial.println(btn[i].text);
-            eventControl(btn[i].text)
+            // eventControl(btn[i].text);
             break;
           case BUTTON_CLASS::SpeedButton:
             Serial.println(btn[i].text);
