@@ -4,79 +4,8 @@
 #include "LCD_Touch.h"
 #include "Button.h"
 #include <EEPROM.h>
-
-// create enum of button names
-// Buttons for the main button
-
-enum STYLE {
-  COL0 = 10,
-  COL1 = 110,
-  COL2 = 180,
-  COL3 = 250,
-  COL4 = 330,
-  COL5 = 400,
-  COL6 = 480,
-  ROW0 = 10,
-  ROW1 = 60,
-  ROW2 = 110,
-  ROW3 = 160,
-  ROW4 = 210,
-  ROW5 = 260
-};
-
-enum BUTTON_CLASS {
-  MainButton = 1,
-  MemoryButton = 2,
-  ValueButton = 3,
-  SpeedButton = 4,
-  DisplayButton = 5
-};
-
-enum MAIN_BUTTON_NAME {
-  Home = 1,
-  Stop = 2,
-  Live = 3,
-  Manual = 4,
-  Go = 5,
-  Status = 6
-};
-
-enum MEMORY_BUTTON_NAME {
-  Memory1 = 1,
-  Memory2 = 2,
-  Memory3 = 3,
-  Memory4 = 4,
-  Memory5 = 5
-};
-
-enum VALUE_BUTTON_NAME {
-  Value1 = 1,
-  Value2 = 2,
-  Value3 = 3,
-  Value4 = 4,
-  Value5 = 5
-};
-
-enum SPEED_BUTTON_NAME {
-  sp1 = 1,
-  sp2 = 2,
-  sp3 = 3,
-  sp4 = 4,
-  sp5 = 5,
-  sp6 = 6
-};
-
-enum DisplayButtonName {
-  Digit1 = 1,
-  Digit2 = 2,
-  Plus1 = 3,
-  Plus2 = 4,
-  Plus3 = 5,
-  Minus1 = 6,
-  Minus2 = 7,
-  Minus3 = 8
-};
-
+#include "Constants.h"
+#include "Utils.h"
 
 Button btn[] = {
   Button(STYLE::COL0, STYLE::ROW0, STYLE::COL1, STYLE::ROW1, "Home", BUTTON_CLASS::MainButton, MAIN_BUTTON_NAME::Home),
@@ -85,10 +14,10 @@ Button btn[] = {
   Button(STYLE::COL0, STYLE::ROW3, STYLE::COL1, STYLE::ROW4, "Manual", BUTTON_CLASS::MainButton, MAIN_BUTTON_NAME::Manual),
   Button(STYLE::COL0, STYLE::ROW4, STYLE::COL1, STYLE::ROW5, "Go", BUTTON_CLASS::MainButton, MAIN_BUTTON_NAME::Go),
   
-  Button(STYLE::COL0, STYLE::ROW5, STYLE::COL1, STYLE::ROW5, "sp1", BUTTON_CLASS::SpeedButton, SPEED_BUTTON_NAME::sp1),
-  Button(STYLE::COL1, STYLE::ROW5, STYLE::COL2, STYLE::ROW5, "sp2", BUTTON_CLASS::SpeedButton, SPEED_BUTTON_NAME::sp2),
-  Button(STYLE::COL2, STYLE::ROW5, STYLE::COL3, STYLE::ROW5, "sp3", BUTTON_CLASS::SpeedButton, SPEED_BUTTON_NAME::sp3),
-  Button(STYLE::COL3, STYLE::ROW5, STYLE::COL4, STYLE::ROW5, "sp4", BUTTON_CLASS::SpeedButton, SPEED_BUTTON_NAME::sp4),
+  Button(STYLE::COL0, STYLE::ROW5, STYLE::COL1, STYLE::ROW6, "sp1", BUTTON_CLASS::SpeedButton, SPEED_BUTTON_NAME::sp1),
+  Button(STYLE::COL1, STYLE::ROW5, STYLE::COL2, STYLE::ROW6, "sp2", BUTTON_CLASS::SpeedButton, SPEED_BUTTON_NAME::sp2),
+  Button(STYLE::COL2, STYLE::ROW5, STYLE::COL3, STYLE::ROW6, "sp3", BUTTON_CLASS::SpeedButton, SPEED_BUTTON_NAME::sp3),
+  Button(STYLE::COL3, STYLE::ROW5, STYLE::COL4, STYLE::ROW6, "sp4", BUTTON_CLASS::SpeedButton, SPEED_BUTTON_NAME::sp4),
   // Button(STYLE::COL4, STYLE::ROW5, STYLE::COL5, STYLE::ROW5, "sp5", BUTTON_CLASS::SpeedButton, SPEED_BUTTON_NAME::sp5),
   // Button(STYLE::COL5, STYLE::ROW5, STYLE::COL6, STYLE::ROW5, "sp6", BUTTON_CLASS::SpeedButton, SPEED_BUTTON_NAME::sp6),
 
@@ -101,27 +30,20 @@ Button btn[] = {
   Button(STYLE::COL3, STYLE::ROW2, STYLE::COL4, STYLE::ROW3, "-", BUTTON_CLASS::DisplayButton, DisplayButtonName::Minus3),
   Button(STYLE::COL1, STYLE::ROW3, STYLE::COL4, STYLE::ROW4, "Status", BUTTON_CLASS::MainButton, MAIN_BUTTON_NAME::Status),
 
-  Button(STYLE::COL4, STYLE::ROW0, STYLE::COL5, STYLE::ROW1, "Memory 1", BUTTON_CLASS::MemoryButton, MEMORY_BUTTON_NAME::Memory1),
-  Button(STYLE::COL5, STYLE::ROW0, STYLE::COL6, STYLE::ROW1, "Value 1", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value1),
-  Button(STYLE::COL4, STYLE::ROW1, STYLE::COL5, STYLE::ROW2, "Memory 2", BUTTON_CLASS::MemoryButton, MEMORY_BUTTON_NAME::Memory2),
-  Button(STYLE::COL5, STYLE::ROW1, STYLE::COL6, STYLE::ROW2, "Value 2", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value2),
-  Button(STYLE::COL4, STYLE::ROW2, STYLE::COL5, STYLE::ROW3, "Memory 3", BUTTON_CLASS::MemoryButton, MEMORY_BUTTON_NAME::Memory3),
-  Button(STYLE::COL5, STYLE::ROW2, STYLE::COL6, STYLE::ROW3, "Value 3", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value3),
-  Button(STYLE::COL4, STYLE::ROW3, STYLE::COL5, STYLE::ROW4, "Memory 4", BUTTON_CLASS::MemoryButton, MEMORY_BUTTON_NAME::Memory4),
-  Button(STYLE::COL5, STYLE::ROW3, STYLE::COL6, STYLE::ROW4, "Value 4", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value4),
-  Button(STYLE::COL4, STYLE::ROW4, STYLE::COL5, STYLE::ROW5, "Memory 5", BUTTON_CLASS::MemoryButton, MEMORY_BUTTON_NAME::Memory5),
-  Button(STYLE::COL5, STYLE::ROW4, STYLE::COL6, STYLE::ROW5, "Value 5", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value5)
+  Button(STYLE::COL4, STYLE::ROW0, STYLE::COL5, STYLE::ROW1, "Mem 1", BUTTON_CLASS::MemoryButton, MEMORY_BUTTON_NAME::Memory1),
+  Button(STYLE::COL5, STYLE::ROW0, STYLE::COL6, STYLE::ROW1, "Val 1", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value1),
+  Button(STYLE::COL4, STYLE::ROW1, STYLE::COL5, STYLE::ROW2, "Mem 2", BUTTON_CLASS::MemoryButton, MEMORY_BUTTON_NAME::Memory2),
+  Button(STYLE::COL5, STYLE::ROW1, STYLE::COL6, STYLE::ROW2, "Val 2", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value2),
+  Button(STYLE::COL4, STYLE::ROW2, STYLE::COL5, STYLE::ROW3, "Mem 3", BUTTON_CLASS::MemoryButton, MEMORY_BUTTON_NAME::Memory3),
+  Button(STYLE::COL5, STYLE::ROW2, STYLE::COL6, STYLE::ROW3, "Val 3", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value3),
+  Button(STYLE::COL4, STYLE::ROW3, STYLE::COL5, STYLE::ROW4, "Mem 4", BUTTON_CLASS::MemoryButton, MEMORY_BUTTON_NAME::Memory4),
+  Button(STYLE::COL5, STYLE::ROW3, STYLE::COL6, STYLE::ROW4, "Val 4", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value4),
+  Button(STYLE::COL4, STYLE::ROW4, STYLE::COL5, STYLE::ROW5, "Mem 5", BUTTON_CLASS::MemoryButton, MEMORY_BUTTON_NAME::Memory5),
+  Button(STYLE::COL5, STYLE::ROW4, STYLE::COL6, STYLE::ROW5, "Val 5", BUTTON_CLASS::ValueButton, VALUE_BUTTON_NAME::Value5)
 };
 
+Servo myservo;
 
-// create value button below memory buttons 
-
-int readValueFromEEPROM(int index)
-{
-  byte high = EEPROM.read((btn[index].id - 1) * 2);
-  byte low = EEPROM.read((btn[index].id - 1) * 2 + 1);
-  return (word(high, low));
-}
 
 void setup()
 {
@@ -131,7 +53,7 @@ void setup()
   Serial.println("Init...");
   LCD_SCAN_DIR Lcd_ScanDir = SCAN_DIR_DFT;    //SCAN_DIR_DFT = D2U_L2R
   LCD_Init( Lcd_ScanDir, 200);  
-
+  
   Serial.println("Init Touch Pad...");
   TP_Init( Lcd_ScanDir );
   TP_GetAdFac();
@@ -149,8 +71,23 @@ void setup()
 }
 TP_DRAW event;
 int num = 0;
-void handleDigit(int i);
-void modifyDigit(int i);
+
+void eventControl(int btn)
+{
+  if(btn == BUTTON_CLASS::MainButton::Home)
+  {
+    
+  }
+  else if(btn == BUTTON_CLASS::MainButton::Stop)
+  {
+    Serial.println("Stop");
+  }
+  else if(btn == BUTTON_CLASS::MainButton::Go)
+  {
+    Serial.println("Go");
+  }
+}
+
 void loop()
 {
   // TP_DrawBoard();
@@ -161,6 +98,7 @@ void loop()
         switch (btn[i].class_id) {
           case BUTTON_CLASS::MainButton:
             Serial.println(btn[i].text);
+            eventControl(btn[i].text)
             break;
           case BUTTON_CLASS::SpeedButton:
             Serial.println(btn[i].text);
@@ -182,67 +120,6 @@ void loop()
   delay(10);
 }
 
-void handleDigit(int i)
-{
-  if (btn[i].id == DisplayButtonName::Plus1)
-  {
-    Serial.println("plusButton");
-    modifyDigit(100);
-  }
-  else if (btn[i].id == DisplayButtonName::Minus1)
-  {
-    Serial.println("minusButton");
-    modifyDigit(-100);
-  }
-  else if (btn[i].id == DisplayButtonName::Plus2)
-  {
-    Serial.println("plusButton2");
-    modifyDigit(10);
-  }
-  else if (btn[i].id == DisplayButtonName::Minus2)
-  {
-    Serial.println("minusButton2");
-    modifyDigit(-10);
-  }
-  else if (btn[i].id == DisplayButtonName::Plus3)
-  {
-    Serial.println("plusButton3");
-    modifyDigit(1);
-  }
-  else if (btn[i].id == DisplayButtonName::Minus3)
-  {
-    Serial.println("minusButton3");
-    modifyDigit(-1);
-  }
-}
-
-void modifyDigit(int val)
-{
-  num = num + val;
-  if (num > 999)
-    num = 999;
-  if (num < 0)
-    num = 0;
-  btn[12].clear();
-  btn[12].displayNumber(num);
-}
-
-void performMemoryButtonAction(int i) {
-  Serial.println(btn[i].text);
-  EEPROM.write((btn[i].id - 1) * 2,highByte(num));
-  EEPROM.write((btn[i].id - 1) * 2 + 1,lowByte(num));
-  btn[i + 1].clear();
-  btn[i + 1].displayNumber(num);
-  delay(5000);
-}
-void updateValueButton(int index)
-{
-  Serial.println(btn[index].text);
-  Serial.println("valueButton5");
-  num=readValueFromEEPROM(index);
-  btn[12].clear();
-  btn[12].displayNumber(num);
-}
 /*********************************************************************************************************
   END FILE
 *********************************************************************************************************/
