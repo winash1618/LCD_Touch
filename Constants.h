@@ -1,11 +1,3 @@
-
-#define stp 30
-#define dir 28
-#define MS1 26
-#define MS2 24
-#define EN  22
-#define LIMIT 32
-
 enum STYLE {
   COL0 = 10,
   COL1 = 110,

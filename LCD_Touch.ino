@@ -121,13 +121,13 @@ Events events;
 
 void setup()
 {
-  System_Init();
   pinMode(stp, OUTPUT);
   pinMode(dir, OUTPUT);
   pinMode(MS1, OUTPUT);
   pinMode(MS2, OUTPUT);
   pinMode(EN, OUTPUT);
   pinMode(LIMIT, INPUT_PULLUP);
+  System_Init();
   Serial.println("3.5inch TFT Touch Shield Touch Demo");
   Serial.println("Init...");
   LCD_SCAN_DIR Lcd_ScanDir = SCAN_DIR_DFT;    //SCAN_DIR_DFT = D2U_L2R
@@ -178,7 +178,7 @@ void loop()
         switch (btn[i].class_id) {
           case BUTTON_CLASS::MainButton:
             Serial.println(btn[i].text);
-            // eventControl(btn[i].text);
+            eventControl(btn[i].id);
             break;
           case BUTTON_CLASS::SpeedButton:
             Serial.println(btn[i].text);
